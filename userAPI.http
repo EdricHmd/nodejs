@@ -1,0 +1,22 @@
+// [Post] create user
+# POST http://localhost:3001/api/users/create
+# Content-Type: application/json
+
+
+
+// [Get] fetch all users
+# GET http://localhost:3001/api/users/all
+
+// [Get] fetch detail user
+# GET http://localhost:3001/api/users/detail/69283fec69d38c7614977e63
+
+// [Put] update user
+PUT http://localhost:3001/api/users/update/69283fec69d38c7614977e63
+Content-Type: application/json
+
+{
+  "name": "Updated User Name",
+  "email": "updated.user@example.com"
+  ,
+  "age": 35
+}
