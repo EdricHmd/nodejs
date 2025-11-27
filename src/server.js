@@ -2,7 +2,7 @@ import express from 'express';
 import connectDB from './config/db.js';
 import userRoutes from './routes/userRoutes.js';
 import dotenv from 'dotenv';
-import { swaggerUi, swaggerSpec } from './swagger.js';
+import {swaggerDocs  } from './swagger.js';
 
 dotenv.config();
 
@@ -13,9 +13,9 @@ const PORT = process.env.PORT  || 3001;
 connectDB();
 
 app.use(express.json());
+swaggerDocs(app);
 
 // Swagger UI
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use('/api/users', userRoutes);
 

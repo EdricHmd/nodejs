@@ -15,6 +15,10 @@ const options = {
         },
         servers: [
             {
+                url: 'https://nodejs-kair.onrender.com',
+                description: 'Production server'
+            },
+            {
                 url: 'http://localhost:3001',
                 description: 'Development server'
             }
@@ -174,4 +178,6 @@ const options = {
 
 const swaggerSpec = swaggerJsdoc(options);
 
-export { swaggerUi, swaggerSpec };
+export const swaggerDocs = (app) => {
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+};
