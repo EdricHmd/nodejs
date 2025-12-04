@@ -5,9 +5,9 @@ const options = {
     definition: {
         openapi: '3.0.0',
         info: {
-            title: 'User Management API',
+            title: 'User & Project Management API',
             version: '1.0.0',
-            description: 'API documentation for User Management System',
+            description: 'API documentation for User and Project Management System',
             contact: {
                 name: 'API Support',
                 email: 'support@example.com'
@@ -167,6 +167,197 @@ const options = {
                         message: {
                             type: 'string',
                             example: 'Internal server error'
+                        }
+                    }
+                },
+                Project: {
+                    type: 'object',
+                    required: ['name', 'owner'],
+                    properties: {
+                        _id: {
+                            type: 'string',
+                            description: 'Auto-generated MongoDB ObjectId',
+                            example: '507f1f77bcf86cd799439011'
+                        },
+                        name: {
+                            type: 'string',
+                            description: 'Project name',
+                            example: 'Website Redesign'
+                        },
+                        description: {
+                            type: 'string',
+                            description: 'Project description',
+                            example: 'Complete redesign of company website'
+                        },
+                        status: {
+                            type: 'string',
+                            enum: ['pending', 'in-progress', 'completed'],
+                            description: 'Project status',
+                            default: 'pending',
+                            example: 'in-progress'
+                        },
+                        startDate: {
+                            type: 'string',
+                            format: 'date-time',
+                            description: 'Project start date',
+                            example: '2025-12-04T10:00:00.000Z'
+                        },
+                        owner: {
+                            type: 'object',
+                            description: 'Project owner (populated user data)',
+                            properties: {
+                                _id: {
+                                    type: 'string',
+                                    example: '507f1f77bcf86cd799439012'
+                                },
+                                name: {
+                                    type: 'string',
+                                    example: 'John Doe'
+                                },
+                                email: {
+                                    type: 'string',
+                                    example: 'john.doe@example.com'
+                                }
+                            }
+                        },
+                        createdAt: {
+                            type: 'string',
+                            format: 'date-time',
+                            description: 'Timestamp when project was created'
+                        },
+                        updatedAt: {
+                            type: 'string',
+                            format: 'date-time',
+                            description: 'Timestamp when project was last updated'
+                        }
+                    }
+                },
+                ProjectInput: {
+                    type: 'object',
+                    required: ['name', 'owner'],
+                    properties: {
+                        name: {
+                            type: 'string',
+                            description: 'Project name',
+                            example: 'Website Redesign'
+                        },
+                        description: {
+                            type: 'string',
+                            description: 'Project description',
+                            example: 'Complete redesign of company website'
+                        },
+                        status: {
+                            type: 'string',
+                            enum: ['pending', 'in-progress', 'completed'],
+                            description: 'Project status',
+                            example: 'pending'
+                        },
+                        startDate: {
+                            type: 'string',
+                            format: 'date-time',
+                            description: 'Project start date',
+                            example: '2025-12-04T10:00:00.000Z'
+                        },
+                        owner: {
+                            type: 'string',
+                            description: 'User ID (MongoDB ObjectId) who owns the project',
+                            example: '507f1f77bcf86cd799439012'
+                        }
+                    }
+                },
+                ProjectUpdateInput: {
+                    type: 'object',
+                    properties: {
+                        name: {
+                            type: 'string',
+                            description: 'Project name',
+                            example: 'Website Redesign - Updated'
+                        },
+                        description: {
+                            type: 'string',
+                            description: 'Project description',
+                            example: 'Updated project description'
+                        },
+                        status: {
+                            type: 'string',
+                            enum: ['pending', 'in-progress', 'completed'],
+                            description: 'Project status',
+                            example: 'completed'
+                        },
+                        startDate: {
+                            type: 'string',
+                            format: 'date-time',
+                            description: 'Project start date',
+                            example: '2025-12-05T10:00:00.000Z'
+                        }
+                    }
+                },
+                ProjectSuccessResponse: {
+                    type: 'object',
+                    properties: {
+                        success: {
+                            type: 'boolean',
+                            example: true
+                        },
+                        message: {
+                            type: 'string',
+                            example: 'Operation completed successfully'
+                        },
+                        data: {
+                            $ref: '#/components/schemas/Project'
+                        }
+                    }
+                },
+                ProjectsListResponse: {
+                    type: 'object',
+                    properties: {
+                        success: {
+                            type: 'boolean',
+                            example: true
+                        },
+                        message: {
+                            type: 'string',
+                            example: 'Lấy danh sách dự án thành công'
+                        },
+                        data: {
+                            type: 'array',
+                            items: {
+                                $ref: '#/components/schemas/Project'
+                            }
+                        }
+                    }
+                },
+                ProjectErrorResponse: {
+                    type: 'object',
+                    properties: {
+                        success: {
+                            type: 'boolean',
+                            example: false
+                        },
+                        message: {
+                            type: 'string',
+                            example: 'Error message'
+                        },
+                        errorCode: {
+                            type: 'string',
+                            example: 'ERROR_CODE'
+                        }
+                    }
+                },
+                ProjectNotFoundError: {
+                    type: 'object',
+                    properties: {
+                        success: {
+                            type: 'boolean',
+                            example: false
+                        },
+                        message: {
+                            type: 'string',
+                            example: 'Không tìm thấy dự án'
+                        },
+                        errorCode: {
+                            type: 'string',
+                            example: 'PROJECT_NOT_FOUND'
                         }
                     }
                 }
