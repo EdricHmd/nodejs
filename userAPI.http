@@ -20,3 +20,27 @@ Content-Type: application/json
   ,
   "age": 35
 }
+
+###
+POST http://localhost:3001/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "superdev",
+  "password": "password123",
+  "email": "superdev12@example.com",
+  "fullName": "Senior Developer"
+}
+
+###
+POST http://localhost:3001/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "superdev12@example.com",
+  "password": "password123"
+}
+
+###
+GET http://localhost:3001/api/auth/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MzJlMzBhZGMyNTI1MzE5NjUzOGIwMyIsImlhdCI6MTc2NDk0MzUyOSwiZXhwIjoxNzY1MDI5OTI5fQ.bOdMKDeobtGU_meBUOh16GO8aDo5HJmv1uDYJxCUI3o
