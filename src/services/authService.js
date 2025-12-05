@@ -23,20 +23,41 @@ export const register = async (data) => {
   const token = generateToken(newUser._id);
   return { user: newUser, token };
 };
-
 // 2. Đăng nhập
-export const login = async (email, password) => {
-  // kiểm tra email
+
+export const loginUser = async ({ email, password }) => {
   const user = await User.findOne({ email });
+  
+  // Kiểm tra email
   if (!user) {
-    throw new Error('Invalid email or password');
+    throw new Error('INVALID_CREDENTIALS');
   }
-  // kiểm tra password
+
+  // Kiểm tra password (dùng hàm method của Model)
   const isMatch = await user.comparePassword(password);
   if (!isMatch) {
-    throw new Error('Invalid email or password');
+    throw new Error('INVALID_CREDENTIALS');
   }
-  // tạo token
+
+  // Tạo Token
   const token = generateToken(user._id);
-  return { user, token };
+
+  return {
+    token,
+    user: {
+      id: user._id,
+      email: user.email,
+      name: user.name,
+      role: user.role
+    }
+  };
+};
+
+// 3. Lấy thông tin người dùng
+export const getProfile = async (userId) => {
+  const user = await User.findById(userId).select('-password');
+  if (!user) {
+    throw new Error('User not found');
+  }
+  return user;
 };

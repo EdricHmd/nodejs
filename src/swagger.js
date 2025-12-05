@@ -360,6 +360,218 @@ const options = {
                             example: 'PROJECT_NOT_FOUND'
                         }
                     }
+                },
+                RegisterInput: {
+                    type: 'object',
+                    required: ['name', 'email', 'password'],
+                    properties: {
+                        name: {
+                            type: 'string',
+                            description: 'User full name',
+                            example: 'John Doe'
+                        },
+                        email: {
+                            type: 'string',
+                            format: 'email',
+                            description: 'User email address',
+                            example: 'john.doe@example.com'
+                        },
+                        password: {
+                            type: 'string',
+                            format: 'password',
+                            minLength: 6,
+                            description: 'User password (minimum 6 characters)',
+                            example: 'password123'
+                        },
+                        age: {
+                            type: 'number',
+                            description: 'User age',
+                            default: 18,
+                            example: 25
+                        }
+                    }
+                },
+                LoginInput: {
+                    type: 'object',
+                    required: ['email', 'password'],
+                    properties: {
+                        email: {
+                            type: 'string',
+                            format: 'email',
+                            description: 'User email address',
+                            example: 'john.doe@example.com'
+                        },
+                        password: {
+                            type: 'string',
+                            format: 'password',
+                            description: 'User password',
+                            example: 'password123'
+                        }
+                    }
+                },
+                AuthSuccessResponse: {
+                    type: 'object',
+                    properties: {
+                        success: {
+                            type: 'boolean',
+                            example: true
+                        },
+                        message: {
+                            type: 'string',
+                            example: 'Operation completed successfully'
+                        },
+                        data: {
+                            type: 'object',
+                            properties: {
+                                user: {
+                                    type: 'object',
+                                    properties: {
+                                        _id: {
+                                            type: 'string',
+                                            example: '507f1f77bcf86cd799439011'
+                                        },
+                                        name: {
+                                            type: 'string',
+                                            example: 'John Doe'
+                                        },
+                                        email: {
+                                            type: 'string',
+                                            example: 'john.doe@example.com'
+                                        },
+                                        age: {
+                                            type: 'number',
+                                            example: 25
+                                        },
+                                        createdAt: {
+                                            type: 'string',
+                                            format: 'date-time'
+                                        },
+                                        updatedAt: {
+                                            type: 'string',
+                                            format: 'date-time'
+                                        }
+                                    }
+                                },
+                                token: {
+                                    type: 'string',
+                                    description: 'JWT authentication token',
+                                    example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwN2YxZjc3YmNmODZjZDc5OTQzOTAxMSIsImlhdCI6MTYzMjE0NTIwMCwiZXhwIjoxNjMyNzUwMDAwfQ.xyz123'
+                                }
+                            }
+                        }
+                    }
+                },
+                LoginSuccessResponse: {
+                    type: 'object',
+                    properties: {
+                        success: {
+                            type: 'boolean',
+                            example: true
+                        },
+                        message: {
+                            type: 'string',
+                            example: 'Đăng nhập thành công'
+                        },
+                        data: {
+                            type: 'object',
+                            properties: {
+                                user: {
+                                    type: 'object',
+                                    properties: {
+                                        token: {
+                                            type: 'string',
+                                            description: 'JWT authentication token',
+                                            example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.xyz123'
+                                        },
+                                        user: {
+                                            type: 'object',
+                                            properties: {
+                                                id: {
+                                                    type: 'string',
+                                                    example: '507f1f77bcf86cd799439011'
+                                                },
+                                                name: {
+                                                    type: 'string',
+                                                    example: 'John Doe'
+                                                },
+                                                email: {
+                                                    type: 'string',
+                                                    example: 'john.doe@example.com'
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                ProfileSuccessResponse: {
+                    type: 'object',
+                    properties: {
+                        success: {
+                            type: 'boolean',
+                            example: true
+                        },
+                        message: {
+                            type: 'string',
+                            example: 'Lấy thông tin người dùng thành công'
+                        },
+                        data: {
+                            type: 'object',
+                            properties: {
+                                _id: {
+                                    type: 'string',
+                                    example: '507f1f77bcf86cd799439011'
+                                },
+                                name: {
+                                    type: 'string',
+                                    example: 'John Doe'
+                                },
+                                email: {
+                                    type: 'string',
+                                    example: 'john.doe@example.com'
+                                },
+                                age: {
+                                    type: 'number',
+                                    example: 25
+                                },
+                                createdAt: {
+                                    type: 'string',
+                                    format: 'date-time'
+                                },
+                                updatedAt: {
+                                    type: 'string',
+                                    format: 'date-time'
+                                }
+                            }
+                        }
+                    }
+                },
+                AuthErrorResponse: {
+                    type: 'object',
+                    properties: {
+                        success: {
+                            type: 'boolean',
+                            example: false
+                        },
+                        message: {
+                            type: 'string',
+                            example: 'Error message'
+                        },
+                        errorCode: {
+                            type: 'string',
+                            example: 'ERROR_CODE'
+                        }
+                    }
+                }
+            },
+            securitySchemes: {
+                bearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                    description: 'Enter JWT token in format: Bearer <token>'
                 }
             }
         }

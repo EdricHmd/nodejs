@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
-const User = mongoose.model('User', userSchema);
+
 // 🔒 Middleware: Tự động mã hóa password trước khi lưu
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
@@ -36,5 +36,5 @@ userSchema.methods.comparePassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-
+const User = mongoose.model('User', userSchema);
 export default User;
