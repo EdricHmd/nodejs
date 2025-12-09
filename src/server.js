@@ -5,12 +5,32 @@ import dotenv from 'dotenv';
 import {swaggerDocs  } from './swagger.js';
 import projectRoutes from './routes/projectRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import cors from 'cors';
 
 
 
 dotenv.config();
 
 const app = express();
+
+// Cách 1: Cho phép tất cả (Dễ tính - Dùng khi Dev)
+// Frontend ở port nào cũng gọi được
+app.use(
+  cors({
+    origin: "*", // cho public toàn bộ
+    credentials: true, // cho phép cookie nếu cần
+  })
+);
+
+// Cách 2: Chỉ cho phép domain cụ thể (Dùng khi Production)
+/*
+app.use(cors({
+  origin: 'http://localhost:5173', // Chỉ cho phép Frontend React ở port 5173 gọi
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true // Cho phép gửi cookie nếu cần
+}));
+*/
+
 app.use(express.json());
 const PORT = process.env.PORT  || 3001;
 
