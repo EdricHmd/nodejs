@@ -564,6 +564,47 @@ const options = {
                             example: 'ERROR_CODE'
                         }
                     }
+                },
+                RefreshTokenSuccessResponse: {
+                    type: 'object',
+                    properties: {
+                        message: {
+                            type: 'string',
+                            example: 'Lấy token mới thành công'
+                        },
+                        accessToken: {
+                            type: 'string',
+                            description: 'New JWT access token',
+                            example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwN2YxZjc3YmNmODZjZDc5OTQzOTAxMSIsImlhdCI6MTYzMjE0NTIwMCwiZXhwIjoxNjMyNzUwMDAwfQ.xyz123'
+                        }
+                    }
+                },
+                RefreshTokenErrorResponse: {
+                    type: 'object',
+                    properties: {
+                        message: {
+                            type: 'string',
+                            example: 'Refresh token không tồn tại'
+                        }
+                    }
+                },
+                LogoutSuccessResponse: {
+                    type: 'object',
+                    properties: {
+                        message: {
+                            type: 'string',
+                            example: 'Đăng xuất thành công'
+                        }
+                    }
+                },
+                LogoutErrorResponse: {
+                    type: 'object',
+                    properties: {
+                        message: {
+                            type: 'string',
+                            example: 'Error message'
+                        }
+                    }
                 }
             },
             securitySchemes: {

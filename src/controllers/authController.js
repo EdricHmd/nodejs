@@ -13,9 +13,15 @@ const COOKIE_OPTIONS = {
 export const register = async (req, res) => {
   try {
      console.log('Request Body:', req.body); // Debug: log the request body
-    const { user, token } = await authService.register(req.body);
-    
-    return success(res, 'Đăng ký thành công', { user, token });
+    const { user, token, refreshToken } = await authService.register(req.body);
+    // Lưu refreshToken vào cookie httpOnly
+    res.cookie("refreshToken", refreshToken, COOKIE_OPTIONS);
+
+    //Trả về user không chứa refreshToken
+
+
+    return success(res, 'Đăng ký thành công', { 
+      user: { id: user._id, email: user.email, name: user.name, role: user.role }, accessToken: token });
   } catch (err) {
     return error(res, err.message, 400, 'REGISTER_FAILED');
   }
@@ -24,14 +30,15 @@ export const register = async (req, res) => {
 export const login = async (req, res) => {
   try {
   console.log('Request Body:', req.body); // Debug: log the request body
-    const user = await authService.loginUser(req.body);
-    // Tạo Access Token và Refresh Token
-    const tokens = authService.generateToken(user._id);
+    const result = await authService.loginUser(req.body);
     
     // Lưu refreshToken vào cookie httpOnly
-    res.cookie("refreshToken", tokens.refreshToken, COOKIE_OPTIONS);
+    res.cookie("refreshToken", result.token.refreshToken, COOKIE_OPTIONS);
     
-    return success(res, 'Đăng nhập thành công', { user, tokens });
+    return success(res, 'Đăng nhập thành công', { 
+      accessToken: result.token.accessToken,
+      user: result.user
+    });
   } catch (err) {
     return error(res, err.message, 401, 'LOGIN_FAILED');
   }
@@ -42,7 +49,7 @@ export const refresh = async (req, res) => {
     const refreshTokenFromCookie = req.cookies.refreshToken;
 
     // Gọi service để tạo access token mới
-    const tokens = await authService.refreshTokenProcess(refreshTokenFromCookie);
+    const tokens = await authService.refreshToken(refreshTokenFromCookie);
 
     res.status(200).json({
       message: "Lấy token mới thành công",
@@ -66,7 +73,7 @@ export const getProfile = async (req, res) => {
 export const logoutController = async (req, res) => {
   try {
     // Xóa refreshToken trong DB
-    await logout(req.user._id);
+    await authService.logout(req.user._id);
 
     // Xóa cookie refreshToken trên browser
     res.clearCookie("refreshToken");

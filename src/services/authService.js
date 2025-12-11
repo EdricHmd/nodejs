@@ -27,9 +27,15 @@ export const register = async (data) => {
   }
   // tạo user mới
   const newUser = await User.create(data);
+
   // tạo token
-  const token = generateToken(newUser._id);
-  return { user: newUser, token };
+  const tokens = generateToken(newUser._id);
+  
+  // Lưu refreshToken vào DB
+  newUser.refreshToken = tokens.refreshToken;
+  await newUser.save();
+  
+  return { user: newUser, token: tokens.accessToken, refreshToken: tokens.refreshToken };
 };
 // 2. Đăng nhập
 
@@ -48,10 +54,14 @@ export const loginUser = async ({ email, password }) => {
   }
 
   // Tạo Token
-  const token = generateToken(user._id);
+  const tokens = generateToken(user._id);
+  
+  // Lưu refreshToken vào DB
+  user.refreshToken = tokens.refreshToken;
+  await user.save();
 
   return {
-    token,
+    token: tokens,
     user: {
       id: user._id,
       email: user.email,
@@ -83,13 +93,17 @@ export const refreshToken = async (refreshTokenFromCookie) => {
       refreshTokenFromCookie,
       process.env.JWT_REFRESH_SECRET
     );
+    console.log('Decoded Refresh Token:', decoded); // Debug: log the decoded token
   } catch (error) {
+    console.log(error);
     throw new Error("Refresh token không hợp lệ hoặc đã hết hạn");
   }
 
   // Check trong DB xem token này còn hiệu lực (khớp với DB) không
-  const user = await User.findById(decoded.id).select("+refreshTokens");
-  if (!user || user.refreshTokens !== refreshTokenFromCookie) {
+  
+  const user = await User.findById(decoded.id).select("+refreshToken");
+  console.log('User from DB:', user); // Debug: log the user fetched from DB
+  if (!user || user.refreshToken !== refreshTokenFromCookie) {
     throw new Error("Refresh token không hợp lệ");
   }
 

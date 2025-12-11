@@ -1,5 +1,5 @@
 import express from 'express';
-import { register, login, getProfile } from '../controllers/authController.js';
+import { register, login, getProfile,refresh,logoutController } from '../controllers/authController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
@@ -189,9 +189,89 @@ router.post('/login', login);
  *                   errorCode: "TOKEN_INVALID"
  */
 router.get('/profile', protect, getProfile);
-// API này KHÔNG cần gửi token trong body, cookie tự gửi lên
+
+/**
+ * @swagger
+ * /api/auth/refresh-token:
+ *   post:
+ *     summary: Refresh access token
+ *     description: Generates a new access token using the refresh token stored in httpOnly cookie. The refresh token is automatically sent from the browser cookie.
+ *     tags:
+ *       - Authentication
+ *     responses:
+ *       200:
+ *         description: Lấy token mới thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/RefreshTokenSuccessResponse'
+ *             example:
+ *               message: "Lấy token mới thành công"
+ *               accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwN2YxZjc3YmNmODZjZDc5OTQzOTAxMSIsImlhdCI6MTYzMjE0NTIwMCwiZXhwIjoxNjMyNzUwMDAwfQ.xyz123"
+ *       401:
+ *         description: Refresh token invalid or expired
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/RefreshTokenErrorResponse'
+ *             examples:
+ *               noToken:
+ *                 value:
+ *                   message: "Refresh token không tồn tại"
+ *               invalidToken:
+ *                 value:
+ *                   message: "Refresh token không hợp lệ hoặc đã hết hạn"
+ *               tokenMismatch:
+ *                 value:
+ *                   message: "Refresh token không hợp lệ"
+ */
 router.post('/refresh-token', refresh); 
 
+/**
+ * @swagger
+ * /api/auth/logout:
+ *   post:
+ *     summary: Logout user
+ *     description: Logs out the currently authenticated user by clearing the refresh token from the database and removing the cookie. Requires valid JWT token in Authorization header.
+ *     tags:
+ *       - Authentication
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Đăng xuất thành công
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/LogoutSuccessResponse'
+ *             example:
+ *               message: "Đăng xuất thành công"
+ *       401:
+ *         description: Unauthorized - Invalid or missing token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/AuthErrorResponse'
+ *             examples:
+ *               noToken:
+ *                 value:
+ *                   success: false
+ *                   message: "Bạn chưa đăng nhập"
+ *                   errorCode: "NOT_AUTHORIZED"
+ *               invalidToken:
+ *                 value:
+ *                   success: false
+ *                   message: "Token không hợp lệ hoặc đã hết hạn"
+ *                   errorCode: "TOKEN_INVALID"
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/LogoutErrorResponse'
+ *             example:
+ *               message: "Internal server error"
+ */
 router.post('/logout', protect, logoutController);
 
 export default router;

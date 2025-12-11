@@ -28,13 +28,15 @@ const userSchema = new mongoose.Schema({
   refreshToken: { 
     type: String, 
     select: false // Mặc định không trả về khi query
+    //không  trả về trừ khi ta dùng .select('+refreshToken')
+    
   }
 }, { timestamps: true });
 
 
 // 🔒 Middleware: Tự động mã hóa password trước khi lưu
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+userSchema.pre('save', async function () {
+  if (!this.isModified('password')) return;
   
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);

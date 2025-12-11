@@ -22,25 +22,43 @@ Content-Type: application/json
 }
 
 ###
+# 🔐 ĐĂNG KÝ - Tạo tài khoản mới
+# Response sẽ trả về accessToken và set refreshToken vào cookie
 POST http://localhost:3001/api/auth/register
 Content-Type: application/json
 
 {
-  "name": "superdev",
+  "name": "Test User",
   "password": "password123",
-  "email": "superdev12@example.com",
-  "fullName": "Senior Developer"
+  "email": "testuser11@example.com",
+  "age": 25
 }
 
 ###
+# 🔑 ĐĂNG NHẬP - Lấy token
+# Response sẽ trả về accessToken và set refreshToken vào cookie
 POST http://localhost:3001/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "superdev12@example.com",
-  "password": "password123"
+  "password": "password123",
+  "email": "testuser2@example.com"
 }
 
 ###
+# 👤 LẤY PROFILE - Cần access token
+# Thay YOUR_ACCESS_TOKEN bằng token từ response đăng nhập
 GET http://localhost:3001/api/auth/profile
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MzJlMzBhZGMyNTI1MzE5NjUzOGIwMyIsImlhdCI6MTc2NDk0MzUyOSwiZXhwIjoxNzY1MDI5OTI5fQ.bOdMKDeobtGU_meBUOh16GO8aDo5HJmv1uDYJxCUI3o
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5M2FiYjlhMjRlNzg2MTRkMzdkMGFjNSIsImlhdCI6MTc2NTQ1NjgyMSwiZXhwIjoxNzY1NDU3NzIxfQ.N6RfY4EYE2ybm7ULJzlxPtXdN2PGbWMoISyTaocUAuY
+
+###
+# 🔄 LÀM MỚI TOKEN - KHÔNG cần gửi body
+# refreshToken tự động được gửi từ httpOnly cookie
+# Phải test bằng browser hoặc tool hỗ trợ cookie (Postman/Insomnia)
+POST http://localhost:3001/api/auth/refresh-token
+
+###
+# 🚪 ĐĂNG XUẤT - Cần access token
+# Xóa refreshToken khỏi DB và clear cookie
+POST http://localhost:3001/api/auth/logout
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5M2FiYmQxMjRlNzg2MTRkMzdkMGFjZSIsImlhdCI6MTc2NTQ1Njg1MCwiZXhwIjoxNzY1NDU3NzUwfQ._wrB1937dMsz12qD25UKvrsyDSdd0H7DyEetwfCccnA

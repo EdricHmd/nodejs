@@ -14,7 +14,7 @@ export const protect = async (req, res, next) => {
       // Lấy chuỗi token phía sau chữ "Bearer "
       token = req.headers.authorization.split(' ')[1];
       // Giải mã token để lấy thông tin user
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
       // Lấy thông tin user từ DB
       req.user = await User.findById(decoded.id).select('-password');
       next();
