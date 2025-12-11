@@ -6,7 +6,7 @@ import {swaggerDocs  } from './swagger.js';
 import projectRoutes from './routes/projectRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import cors from 'cors';
-
+import cookieParser from 'cookie-parser'; 
 
 
 dotenv.config();
@@ -37,6 +37,7 @@ const PORT = process.env.PORT  || 3001;
 connectDB();
 
 app.use(express.json());
+app.use(cookieParser());
 
 swaggerDocs(app);
 

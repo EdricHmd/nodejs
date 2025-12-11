@@ -1,13 +1,21 @@
 import User from '../models/userModel.js';
 import jwt from 'jsonwebtoken';
 
-// hàm phụ trợ : tạo token
-const generateToken = (userId) => {
-  return jwt.sign(
+// Hàm utility: Tạo Access Token và Refresh Token
+export const generateToken = (userId) => {
+  const accessToken = jwt.sign({ id: userId }, process.env.JWT_ACCESS_SECRET, {
+    expiresIn: process.env.JWT_ACCESS_EXPIRE,
+  });
+  
+  const refreshToken = jwt.sign(
     { id: userId },
-    process.env.JWT_SECRET,
-    { expiresIn: process.env.JWT_EXPIRE }
+    process.env.JWT_REFRESH_SECRET,
+    {
+      expiresIn: process.env.JWT_REFRESH_EXPIRE,
+    }
   );
+  
+  return { accessToken, refreshToken };
 };
 
 // 1. Đăng ký
@@ -60,4 +68,47 @@ export const getProfile = async (userId) => {
     throw new Error('User not found');
   }
   return user;
+};
+// 3. Refresh Token (Cấp lại Access Token mới)
+export const refreshToken = async (refreshTokenFromCookie) => {
+  // Kiểm tra refresh token có tồn tại hay không
+  if (!refreshTokenFromCookie) {
+    throw new Error("Refresh token không tồn tại");
+  }
+
+  let decoded;
+  try {
+    // Verify token
+    decoded = jwt.verify(
+      refreshTokenFromCookie,
+      process.env.JWT_REFRESH_SECRET
+    );
+  } catch (error) {
+    throw new Error("Refresh token không hợp lệ hoặc đã hết hạn");
+  }
+
+  // Check trong DB xem token này còn hiệu lực (khớp với DB) không
+  const user = await User.findById(decoded.id).select("+refreshTokens");
+  if (!user || user.refreshTokens !== refreshTokenFromCookie) {
+    throw new Error("Refresh token không hợp lệ");
+  }
+
+  // Tạo access token mới
+  const newAccessToken = jwt.sign(
+    { id: user._id },
+    process.env.JWT_ACCESS_SECRET,
+    {
+      expiresIn: process.env.JWT_ACCESS_EXPIRE,
+    }
+  );
+
+  return {
+    accessToken: newAccessToken,
+  };
+};
+export const logout = async (userId) => {
+  // Xóa refresh token trong DB
+  await User.findByIdAndUpdate(userId, {
+    refreshTokens: "", // Hoặc null
+  });
 };

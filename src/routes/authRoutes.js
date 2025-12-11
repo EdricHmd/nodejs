@@ -189,5 +189,9 @@ router.post('/login', login);
  *                   errorCode: "TOKEN_INVALID"
  */
 router.get('/profile', protect, getProfile);
+// API này KHÔNG cần gửi token trong body, cookie tự gửi lên
+router.post('/refresh-token', refresh); 
+
+router.post('/logout', protect, logoutController);
 
 export default router;

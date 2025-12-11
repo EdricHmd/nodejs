@@ -1,11 +1,20 @@
 import * as authService from '../services/authService.js';
 import { success, error } from '../utils/response.js';
 
+// Cấu hình Cookie cho Refresh Token
+const COOKIE_OPTIONS = {
+  httpOnly: true, // Cookie chỉ đọc từ server, client không truy cập được → tăng bảo mật
+  secure: false, // Để false khi chạy local. Lên production (HTTPS) thì set thành true
+  sameSite: 'strict', // Giảm nguy cơ tấn công CSRF
+  maxAge: 7 * 24 * 60 * 60 * 1000 // Thời gian sống của cookie: 7 ngày
+};
+
 // 1. Đăng ký
 export const register = async (req, res) => {
   try {
      console.log('Request Body:', req.body); // Debug: log the request body
     const { user, token } = await authService.register(req.body);
+    
     return success(res, 'Đăng ký thành công', { user, token });
   } catch (err) {
     return error(res, err.message, 400, 'REGISTER_FAILED');
@@ -16,9 +25,32 @@ export const login = async (req, res) => {
   try {
   console.log('Request Body:', req.body); // Debug: log the request body
     const user = await authService.loginUser(req.body);
-    return success(res, 'Đăng nhập thành công', { user });
+    // Tạo Access Token và Refresh Token
+    const tokens = authService.generateToken(user._id);
+    
+    // Lưu refreshToken vào cookie httpOnly
+    res.cookie("refreshToken", tokens.refreshToken, COOKIE_OPTIONS);
+    
+    return success(res, 'Đăng nhập thành công', { user, tokens });
   } catch (err) {
     return error(res, err.message, 401, 'LOGIN_FAILED');
+  }
+};
+export const refresh = async (req, res) => {
+  try {
+    // Lấy refresh token từ cookie
+    const refreshTokenFromCookie = req.cookies.refreshToken;
+
+    // Gọi service để tạo access token mới
+    const tokens = await authService.refreshTokenProcess(refreshTokenFromCookie);
+
+    res.status(200).json({
+      message: "Lấy token mới thành công",
+      accessToken: tokens.accessToken,
+    });
+
+  } catch (error) {
+    res.status(401).json({ message: error.message });
   }
 };
 // 3. Lấy thông tin người dùng (yêu cầu đã đăng nhập)
@@ -28,5 +60,21 @@ export const getProfile = async (req, res) => {
     return success(res, 'Lấy thông tin người dùng thành công', user);
   } catch (err) {
     return error(res, err.message, 400, 'GET_PROFILE_FAILED');
+  }
+};
+// 3. Controller logout
+export const logoutController = async (req, res) => {
+  try {
+    // Xóa refreshToken trong DB
+    await logout(req.user._id);
+
+    // Xóa cookie refreshToken trên browser
+    res.clearCookie("refreshToken");
+
+    res.status(200).json({
+      message: "Đăng xuất thành công"
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

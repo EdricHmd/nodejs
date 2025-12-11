@@ -11,6 +11,11 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    role:{
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
+    },
     age: {
         type: Number,
         default : 18
@@ -20,6 +25,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     minlength: 6,
   },
+  refreshToken: { 
+    type: String, 
+    select: false // Mặc định không trả về khi query
+  }
 }, { timestamps: true });
 
 
