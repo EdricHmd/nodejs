@@ -30,7 +30,7 @@ Content-Type: application/json
 {
   "name": "Test User",
   "password": "password123",
-  "email": "testuser11@example.com",
+  "email": "minhdatskymtp@gmail.com",
   "age": 25
 }
 
@@ -62,3 +62,23 @@ POST http://localhost:3001/api/auth/refresh-token
 # Xóa refreshToken khỏi DB và clear cookie
 POST http://localhost:3001/api/auth/logout
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5M2FiYmQxMjRlNzg2MTRkMzdkMGFjZSIsImlhdCI6MTc2NTQ1Njg1MCwiZXhwIjoxNzY1NDU3NzUwfQ._wrB1937dMsz12qD25UKvrsyDSdd0H7DyEetwfCccnA
+
+
+###
+# 🔐 QUÊN MẬT KHẨU - Gửi email đặt lại mật khẩu
+POST http://localhost:3001/api/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "minhdatskymtp@gmail.com"
+}
+
+###
+# 🔑 ĐẶT LẠI MẬT KHẨU - Cập nhật mật khẩu mới
+# Thay YOUR_RESET_TOKEN bằng token nhận được trong email
+POST http://localhost:3001/api/auth/reset-password/5d656bb90df01fff131b14534c2411de0e26b7f146a1edf91b3a112724dd9926
+Content-Type: application/json
+
+{
+  "password": "123123"
+}

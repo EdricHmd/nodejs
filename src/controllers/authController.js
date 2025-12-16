@@ -85,3 +85,27 @@ export const logoutController = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// 4. Controller quên mật khẩu
+export const forgotPasswordController = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const result = await authService.forgotPassword(email);
+    return success(res, 'Email sent', result);
+  } catch (err) {
+    console.log("🚀 ~ forgotPasswordController ~ err:", err)
+    return error(res, err.message, 400, 'FORGOT_PASSWORD_FAILED');
+  }
+};
+
+// 5. Controller đặt lại mật khẩu
+export const resetPasswordController = async (req, res) => {
+  try {
+    await authService.resetPassword(req.params.token, req.body.password);
+    return success(res, 'Password updated', null);
+  } catch (err) {
+    console.log("🚀 ~ resetPasswordController ~ err:", err)
+    return error(res, err.message, 400, 'RESET_PASSWORD_FAILED');
+  }
+};
+

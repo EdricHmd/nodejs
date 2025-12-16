@@ -1,5 +1,10 @@
 import User from '../models/userModel.js';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
+import { sendEmail } from '../utils/sendEmail.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 // Hàm utility: Tạo Access Token và Refresh Token
 export const generateToken = (userId) => {
@@ -125,4 +130,64 @@ export const logout = async (userId) => {
   await User.findByIdAndUpdate(userId, {
     refreshTokens: "", // Hoặc null
   });
+};
+
+// Logic Quên mật khẩu
+export const forgotPassword = async (email) => {
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw new Error('User not found');
+  }
+  // Tạo token đặt lại mật khẩu
+  const resetToken = user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false });
+  // tạo link
+  const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
+  // Nội dung HTML
+  const messageMail = `
+    <div style="font-family: Arial, sans-serif; padding: 20px;">
+      <h2>Yêu cầu đặt lại mật khẩu</h2>
+      <p>Bạn nhận được email này vì chúng tôi nhận được yêu cầu đổi mật khẩu cho tài khoản của bạn.</p>
+      <a href="${resetUrl}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Đặt lại mật khẩu</a>
+      <p>Hoặc copy link này: ${resetUrl}</p>
+      <p>Link hết hạn sau 10 phút.</p>
+    </div>
+  `;
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: 'Yêu cầu đặt lại mật khẩu',
+      html : messageMail
+    });
+     return { message: 'Email sent' };
+  } catch (error) {
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    await user.save({ validateBeforeSave: false });
+    throw new Error('Email could not be sent');
+  }
+};
+
+// 2. Logic Reset Password (Không đổi)
+export const resetPassword = async (resetToken, newPassword) => {
+  // Mã hóa token để so sánh với DB
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+  // Tìm user theo token và kiểm tra token còn hạn không
+  const user = await User.findOne({
+    resetPasswordToken: hashedToken,
+    resetPasswordExpire: { $gt: Date.now() },
+  });
+  if (!user) {
+    throw new Error('Invalid or expired token');
+  }
+  // Cập nhật mật khẩu mới
+  user.password = newPassword;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+  await user.save();
+
+  return { message: 'Password updated' };
 };
